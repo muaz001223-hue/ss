@@ -1,8 +1,11 @@
-import { config } from "dotenv";
+import nextEnv from "@next/env";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-config({ path: resolve(dirname(fileURLToPath(import.meta.url)), "../.env") });
+nextEnv.loadEnvConfig(
+  resolve(dirname(fileURLToPath(import.meta.url)), ".."),
+  process.env.NODE_ENV === "development",
+);
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
