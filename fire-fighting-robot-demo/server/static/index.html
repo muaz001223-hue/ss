@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#101821">
+    <title>Fireline · Robot Simulation</title>
+    <link rel="stylesheet" href="/static/style.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="/" aria-label="Fireline simulation home">
+          <span class="brand-mark">F</span>
+          <span><strong>FIRELINE</strong><small>SIMULATION LAB</small></span>
+        </a>
+        <div class="topbar-title"><span>VIRTUAL TRAINING ENVIRONMENT</span><strong>Fire response demo</strong></div>
+        <div class="connection"><i id="connectionDot"></i><span id="connectionText">Connecting…</span></div>
+      </header>
+
+      <section class="safety-banner" role="note">
+        <strong>SIMULATION ONLY</strong>
+        <span>No physical motors, pump, servo, or fire equipment are connected.</span>
+      </section>
+
+      <section class="robot-link-card">
+        <div><span class="eyebrow">VIRTUAL ROBOT TERMINAL</span><strong>Choose a Robot ID, then control it from this lab or the Fireline web dashboard.</strong></div>
+        <form id="robotLinkForm" class="robot-link-form">
+          <label for="robotIdInput">ROBOT ID</label>
+          <input id="robotIdInput" name="robotId" list="robotIdOptions" value="robot-1" maxlength="32" pattern="[A-Za-z0-9][A-Za-z0-9._-]{0,31}" autocomplete="off" required>
+          <datalist id="robotIdOptions"></datalist>
+          <button class="button" type="submit">Link ID</button>
+        </form>
+        <span id="robotLinkStatus" class="robot-link-status" aria-live="polite">Starting virtual link…</span>
+      </section>
+
+      <section class="workspace">
+        <div class="main-column">
+          <section class="room-card">
+            <div class="section-heading">
+              <div><span class="eyebrow">LIVE ROOM VIEW</span><h1>Robot mission simulator</h1></div>
+              <div class="room-actions">
+                <button id="startMissionButton" class="button button-fire">▶ Start demo mission</button>
+                <button id="spawnButton" class="button button-fire">＋ Place fire</button>
+                <button id="clearButton" class="button button-quiet">Clear fires</button>
+                <button id="resetButton" class="button button-quiet">Reset</button>
+              </div>
+            </div>
+            <div class="canvas-wrap">
+              <canvas id="roomCanvas" aria-label="Interactive 2D room. Click to place a simulated fire."></canvas>
+              <div id="canvasHint" class="canvas-hint"><span>＋</span> Click in the room to place a simulated fire</div>
+              <div class="canvas-legend"><span><i class="legend-robot"></i>Robot</span><span><i class="legend-fire"></i>Simulated fire</span></div>
+            </div>
+            <div class="room-footer">
+              <span>ROOM <strong>12 × 7.6 m (visual scale)</strong></span>
+              <span>UPDATE <strong>20 Hz simulation · 60 FPS display</strong></span>
+              <span>CONTROLS <strong>WASD / arrow keys in Manual</strong></span>
+            </div>
+          </section>
+
+          <section class="drive-card">
+            <div class="section-heading compact-heading">
+              <div><span class="eyebrow">OPERATOR CONTROLS</span><h2>Drive &amp; mode</h2></div>
+              <div class="mode-switch" role="group" aria-label="Simulation mode">
+                <button id="manualMode" class="mode-button">Manual</button>
+                <button id="autoMode" class="mode-button active">Autopilot</button>
+              </div>
+            </div>
+            <div class="drive-layout">
+              <div class="dpad" aria-label="Manual movement controls">
+                <button data-drive="FORWARD" class="dpad-up" aria-label="Forward">▲</button>
+                <button data-drive="LEFT" class="dpad-left" aria-label="Turn left">◀</button>
+                <span class="dpad-center">DRIVE</span>
+                <button data-drive="RIGHT" class="dpad-right" aria-label="Turn right">▶</button>
+                <button data-drive="BACKWARD" class="dpad-down" aria-label="Backward">▼</button>
+              </div>
+              <div class="drive-info">
+                <div class="drive-status"><span class="status-pulse"></span><span id="modeStatus">Autopilot navigating room</span></div>
+                <p>Click a direction or use the keyboard to move the virtual robot. Manual buttons are disabled during autopilot.</p>
+                <div class="pdf-scenarios" aria-label="PDF sensor test scenarios">
+                  <span>TEST SEARCH ZONES</span>
+                  <button type="button" data-zone-test="right">Right</button>
+                  <button type="button" data-zone-test="front">Front</button>
+                  <button type="button" data-zone-test="left">Left</button>
+                </div>
+                <button id="pumpToggle" class="button button-pump" aria-pressed="false" disabled>Turn simulated pump on</button>
+                <div class="actuators">
+                  <span class="actuator"><i id="pumpDot"></i>SIM PUMP <b id="pumpStatus">OFF</b></span>
+                  <span class="actuator"><i id="servoDot"></i>SIM SERVO <b id="servoStatus">90°</b></span>
+                  <span class="actuator"><i id="motorDot"></i>SIM MOTORS <b id="motorStatus">STOP</b></span>
+                </div>
+              </div>
+              <button id="stopButton" class="stop-button">■ <span>STOP</span></button>
+            </div>
+          </section>
+        </div>
+
+        <aside class="telemetry-column">
+          <section class="telemetry-card">
+            <div class="card-heading"><div><span class="eyebrow">VIRTUAL INPUTS</span><h2>Flame sensors</h2></div><span class="unit-tag">0–1023 ADC</span></div>
+            <div class="sensor sensor-right"><span class="sensor-icon">R</span><span>Right</span><strong id="sensorRight">1023</strong><div class="sensor-meter"><i id="meterRight"></i></div></div>
+            <div class="sensor sensor-front"><span class="sensor-icon">F</span><span>Front</span><strong id="sensorFront">1023</strong><div class="sensor-meter"><i id="meterFront"></i></div></div>
+            <div class="sensor sensor-left"><span class="sensor-icon">L</span><span>Left</span><strong id="sensorLeft">1023</strong><div class="sensor-meter"><i id="meterLeft"></i></div></div>
+            <p class="card-footnote">PDF pump cutoffs: R &lt;250 · F &lt;350 · L &lt;250 ADC. Lower values mean a stronger virtual flame signal.</p>
+          </section>
+
+          <section class="telemetry-card signal-card">
+            <div class="card-heading"><div><span class="eyebrow">LIVE SCAN MONITOR</span><h2 id="scanStatus">Waiting for sensor scan</h2></div><span id="scanDirection" class="unit-tag">NO SIGNAL</span></div>
+            <div class="scan-signal"><span id="scanSignalFill"></span></div>
+            <div class="scan-readings">
+              <span>RIGHT <b id="scanRight">1023</b></span>
+              <span>FRONT <b id="scanFront">1023</b></span>
+              <span>LEFT <b id="scanLeft">1023</b></span>
+            </div>
+            <div class="signal-demo-controls" aria-label="Persistent virtual signal preview">
+              <span>HOLD SIGNAL PREVIEW</span>
+              <button type="button" data-signal-demo="right">Right</button>
+              <button type="button" data-signal-demo="front">Front</button>
+              <button type="button" data-signal-demo="left">Left</button>
+              <button id="autoSignalTestButton" type="button" aria-pressed="false">Start 10s auto test</button>
+            </div>
+            <p id="autoSignalTestStatus" class="card-footnote" aria-live="polite">Virtual-only test: 2-second pulse, cycling Right / Front / Left.</p>
+            <p id="scanDetail" class="card-footnote">Virtual flame-sensor ADC values update at 20 Hz. No physical sensors are connected.</p>
+            <p class="card-footnote">Signal preview parks the robot in Manual mode so the reading stays visible. Choose Autopilot or Start demo mission to resume extinguishing.</p>
+          </section>
+
+          <section class="telemetry-card pin-card">
+            <div class="card-heading"><div><span class="eyebrow">SIMULATED OUTPUTS</span><h2>Pin telemetry</h2></div><span class="unit-tag">UNO · 9600 BAUD</span></div>
+            <div class="pin-grid">
+              <div><span>enA · D10</span><strong id="pinEnA">160</strong></div>
+              <div><span>enB · D5</span><strong id="pinEnB">160</strong></div>
+              <div><span>in1 · D9</span><strong id="pinIn1">0</strong></div>
+              <div><span>in2 · D8</span><strong id="pinIn2">0</strong></div>
+              <div><span>in3 · D7</span><strong id="pinIn3">0</strong></div>
+              <div><span>in4 · D6</span><strong id="pinIn4">0</strong></div>
+              <div><span>servo · A4</span><strong id="pinServo">90°</strong></div>
+              <div><span>pump · A5</span><strong id="pinPump">LOW</strong></div>
+            </div>
+            <p class="card-footnote">Values are virtual only; no Arduino is connected.</p>
+          </section>
+
+          <section class="telemetry-card circuit-card">
+            <div class="card-heading"><div><span class="eyebrow">PDF BUILD INVENTORY</span><h2>Circuit match</h2></div><span class="unit-tag">VIRTUAL</span></div>
+            <div class="circuit-grid">
+              <span><b>Inputs</b> 3 × 4-pin IR flame sensors · R A0 / F A1 / L A2</span>
+              <span><b>Controller</b> Arduino UNO · 9600 baud serial</span>
+              <span><b>Drive</b> L298N · 4 × BO motors + wheels · chassis</span>
+              <span><b>L298N pins</b> ENA D10 · IN1 D9 · IN2 D8 · IN3 D7 · IN4 D6 · ENB D5</span>
+              <span><b>IN1–IN4 states</b> Forward 1001 · Reverse 0110 · Right 0101 · Left 1010 · Stop 0000</span>
+              <span><b>Servo</b> Mini servo · A4 · 40°–140° · 3° steps / 50 ms</span>
+              <span><b>Pump</b> 5–9 V pump + pipe · A5 · TIP122 · 1 kΩ resistor</span>
+              <span><b>Power parts</b> 2 × 3.7 V 18650 cells · power switch · solderless breadboard</span>
+              <span><b>Other parts</b> Water tank/bottle · jumper wires · 104 (100 nF) capacitor</span>
+            </div>
+          </section>
+
+          <section class="telemetry-card logic-card">
+            <div class="card-heading"><div><span class="eyebrow">PDF AUTOPILOT PRIORITY</span><h2>Sensor decision logic</h2></div><span class="unit-tag">ADC</span></div>
+            <ol class="logic-steps">
+              <li><b>Right &lt;250</b><span>STOP · pump ON · servo 90°→40°→90°</span></li>
+              <li><b>Front &lt;350</b><span>STOP · pump ON · servo sweeps 90°–140°–40°–90°</span></li>
+              <li><b>Left &lt;250</b><span>STOP · pump ON · servo 90°→140°→90°</span></li>
+              <li><b>Right 251–700</b><span>Pump OFF · reverse 100 ms · turn right 200 ms</span></li>
+              <li><b>Front 350–800</b><span>Pump OFF · forward</span></li>
+              <li><b>Left 251–700</b><span>Pump OFF · reverse 100 ms · turn left 200 ms</span></li>
+              <li><b>Otherwise</b><span>STOP · pump OFF</span></li>
+            </ol>
+            <p class="card-footnote">PDF branches are evaluated in this order; setup sweeps 90°→140°→40°→95° in 5° steps. Fire depletion after 4 s of virtual pumping is a room-simulation effect, not PDF firmware.</p>
+          </section>
+
+          <section class="telemetry-card log-card">
+            <div class="card-heading"><div><span class="eyebrow">EVENT STREAM</span><h2>Serial monitor</h2></div><span class="live-tag"><i></i>LIVE</span></div>
+            <div id="serialLog" class="serial-log" aria-live="polite"></div>
+          </section>
+        </aside>
+      </section>
+      <footer class="page-footer"><span>FIRELINE SIM LAB</span><span>Local browser simulation · no physical robot connection</span></footer>
+    </main>
+    <script src="/static/app.js" defer></script>
+  </body>
+</html>
