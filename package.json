@@ -10,6 +10,7 @@
     "start": "node scripts/bootstrap.mjs && concurrently -k -n api,web -c yellow,cyan \"npm start -w @fire-robot/server\" \"npm start -w @fire-robot/web\"",
     "bridge": "npm run bridge -w @fire-robot/server",
     "build": "npm run build -w @fire-robot/server && npm run build -w @fire-robot/web",
+    "build:vercel": "npm run build -w @fire-robot/web && node scripts/prepare-vercel.mjs",
     "test": "npm run test -w @fire-robot/server"
   },
   "devDependencies": {

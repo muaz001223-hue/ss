@@ -1,6 +1,8 @@
 node_modules/
 .next/
 dist/
+public/
+web/out/
 web/public/cesium/
 .env
 .env.*

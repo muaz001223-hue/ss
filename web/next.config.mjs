@@ -6,18 +6,21 @@ config({ path: resolve(dirname(fileURLToPath(import.meta.url)), "../.env") });
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: "export",
   reactStrictMode: true,
-  async rewrites() {
-    const controlServerUrl =
-      process.env.CONTROL_SERVER_PROXY_URL ?? "http://127.0.0.1:4100";
+  ...(process.env.NODE_ENV === "development" && {
+    async rewrites() {
+      const controlServerUrl =
+        process.env.CONTROL_SERVER_PROXY_URL ?? "http://127.0.0.1:4100";
 
-    return [
-      {
-        source: "/control-socket.io/:path*",
-        destination: `${controlServerUrl}/socket.io/`,
-      },
-    ];
-  },
+      return [
+        {
+          source: "/control-socket.io/:path*",
+          destination: `${controlServerUrl}/socket.io/`,
+        },
+      ];
+    },
+  }),
 };
 
 export default nextConfig;
