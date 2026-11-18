@@ -11,9 +11,11 @@ upgrade. A dashboard-only Vercel deployment does not expose a USB serial port.
 
 ## Deploy the dashboard to Vercel
 
-1. Import the repository in Vercel and set the project **Root Directory** to
-   `web`. The checked-in `web/vercel.json` selects Next.js and runs the web
-   workspace build, including the Cesium asset copy step.
+1. Import the repository in Vercel and leave the project **Root Directory**
+   at the repository root. The root `vercel.json` selects Next.js, builds the
+   web workspace (including the Cesium asset copy step), and points Vercel to
+   its `.next` output. Alternatively, set **Root Directory** to `web` to use
+   `web/vercel.json`.
 2. Set `NEXT_PUBLIC_CONTROL_SERVER_URL` in the Vercel project to the public
    HTTPS URL of the persistent Socket.IO backend, for example
    `https://control.example.com`. Set `NEXT_PUBLIC_CESIUM_ION_ACCESS_TOKEN`
