@@ -1,21 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "services": {
-    "fire-fighting-robot-demo": {
-      "root": "fire-fighting-robot-demo",
-      "framework": "fastapi"
-    },
-    "web": {
-      "root": "web",
-      "framework": "nextjs"
-    }
-  },
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": {
-        "service": "web"
-      }
-    }
-  ]
+  "framework": "nextjs",
+  "buildCommand": "npm run build:vercel",
+  "outputDirectory": "public"
 }
