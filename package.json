@@ -7,7 +7,7 @@
   ],
   "scripts": {
     "dev": "node scripts/bootstrap.mjs && concurrently -k -n api,web -c yellow,cyan \"npm run dev -w @fire-robot/server\" \"npm run dev -w @fire-robot/web\"",
-    "start": "node scripts/bootstrap.mjs && concurrently -k -n api,web -c yellow,cyan \"npm start -w @fire-robot/server\" \"npm start -w @fire-robot/web\"",
+    "start": "node scripts/bootstrap.mjs && concurrently -k -n api,web -c yellow,cyan \"PORT=2346 npm start -w @fire-robot/server\" \"npx --workspace=@fire-robot/web next start -p ${PORT:-3000}\"",
     "bridge": "npm run bridge -w @fire-robot/server",
     "build": "npm run build -w @fire-robot/server && npm run build -w @fire-robot/web",
     "build:vercel": "npm run build -w @fire-robot/web && node scripts/prepare-vercel.mjs",
