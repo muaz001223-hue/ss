@@ -9,6 +9,21 @@ build and should not be moved into a short-lived serverless function. The
 dashboard and software simulator use Socket.IO polling with a WebSocket
 upgrade. A dashboard-only Vercel deployment does not expose a USB serial port.
 
+## Deploy the combined service to Render
+
+From the repository root, use `npm install && npm run build` as the build
+command and `npm run start` as the start command. The web process serves the
+static export and proxies `/control-socket.io/relay`, `/socket.io`, and
+`/health` to the control server on internal port 4000. Render's assigned
+`PORT` remains the public web port. Leave `NEXT_PUBLIC_CONTROL_SERVER_URL`
+unset to use this same-origin proxy.
+
+Set `DASHBOARD_TOKEN` and `DEVICE_TOKENS_JSON` as Render environment variables
+using independent, randomly generated secrets. The bootstrap script does not
+generate credentials on Render; the server will fail to start if the required
+secrets are missing. Configure `CORS_ORIGIN` for any separately hosted browser
+clients that connect directly to the control server.
+
 ## Deploy the dashboard to Vercel
 
 1. Import the repository in Vercel and leave the project **Root Directory**

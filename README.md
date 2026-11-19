@@ -21,11 +21,14 @@ npm install
 npm run dev
 ```
 
-On the first run, the server creates a private `.env` file containing
-independent, random dashboard, `robot-1`, and `sim-robot-1` tokens and prints
-them once. The web dashboard and simulator default to `sim-robot-1`; `robot-1`
-remains available for a separately configured device. The `.env` file is
-ignored by git and is not overwritten on later runs.
+On the first local run, the server creates a private `.env` file containing
+independent, random dashboard, `robot-1`, and `sim-robot-1` tokens. Read the
+dashboard token from `DASHBOARD_TOKEN` and device tokens from
+`DEVICE_TOKENS_JSON` in that file; they are never printed to logs. The web
+dashboard and simulator default to `sim-robot-1`; `robot-1` remains available
+for a separately configured device. The `.env` file is ignored by git and is
+not overwritten on later runs. On Render, configure these secrets as service
+environment variables instead of relying on a generated `.env` file.
 
 The dashboard connects through a same-origin WebSocket proxy, so it also works
 behind forwarded development ports without exposing port 4100 to the browser.

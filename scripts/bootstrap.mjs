@@ -7,7 +7,9 @@ import { dirname, resolve } from "node:path";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const envPath = resolve(root, ".env");
 
-try {
+if (process.env.RENDER) {
+  console.log("Using Render environment configuration.");
+} else try {
   await access(envPath, constants.F_OK);
   console.log("Using existing .env configuration.");
 } catch {
@@ -31,9 +33,5 @@ try {
 
   await writeFile(envPath, contents, { flag: "wx", mode: 0o600 });
   await chmod(envPath, 0o600);
-  console.log("Created private .env credentials:");
-  console.log(`Dashboard token: ${dashboardToken}`);
-  console.log(`Robot device token (robot-1): ${deviceToken}`);
-  console.log(`Simulator device token (sim-robot-1): ${simulatorToken}`);
-  console.log("Keep these credentials private.");
+  console.log("Created private .env credentials. Read them from .env; keep the file private.");
 }
