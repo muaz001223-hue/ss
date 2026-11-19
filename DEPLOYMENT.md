@@ -22,11 +22,15 @@ upgrade. A dashboard-only Vercel deployment does not expose a USB serial port.
    HTTPS URL of the persistent Socket.IO backend, for example
    `https://control.example.com`. Set `NEXT_PUBLIC_CESIUM_ION_ACCESS_TOKEN`
    only if global 3D building tiles are needed.
-3. Deploy from the Vercel UI, or from the `web` directory:
+3. Deploy from the Vercel UI, or from the repository root using the npm scripts:
 
    ```sh
-   npx vercel --prod
+   npm run deploy:preview
+   npm run deploy:prod
    ```
+
+   The first command creates a preview deployment; the second deploys to
+   production. The Vercel CLI will prompt to link the project on first use.
 
 `NEXT_PUBLIC_CONTROL_SERVER_URL` is public configuration, not a credential.
 Do not put dashboard or device tokens in `NEXT_PUBLIC_*` variables.

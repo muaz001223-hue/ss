@@ -11,6 +11,8 @@
     "bridge": "npm run bridge -w @fire-robot/server",
     "build": "npm run build -w @fire-robot/server && npm run build -w @fire-robot/web",
     "build:vercel": "npm run build -w @fire-robot/web && node scripts/prepare-vercel.mjs",
+    "deploy:preview": "npx vercel",
+    "deploy:prod": "npx vercel --prod",
     "test": "npm run test -w @fire-robot/server"
   },
   "devDependencies": {
